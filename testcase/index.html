@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Tips demo</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8; IE=EmulateIE9">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script type="text/javascript" src="../jtips.js"></script>
+  <!--[if lt IE 9]>
+  <script type="text/javascript" src="js/excanvas/excanvas.js"></script>
+<![endif]-->
+
+  <style type="text/css">
+      table{
+          position: absolute;
+	      top:100px;
+	      left:100px;
+      }
+      table td{
+	    width:50px;
+		height:100px;
+	  }
+  </style>
+  <script type="text/javascript">
+     jQuery(document).ready(function($) {
+        var getdata=function(){
+               var dtd = jQuery.Deferred();
+                 $.get('tips.php', function(data) {
+                   dtd.resolve({'content':'success'});
+                });
+               return dtd.promise(); 
+        };
+
+        new $.jtips().create({target:$('#target1'),config:{
+		  uid:'target1_tips',
+          layout:'bl',
+          content:'content1',
+		  triggerEvent:'click',
+		  afterRender: function(){},
+          ajax: true,
+		  ajaxconfig:{
+		     ajaxcb:getdata
+		  }
+       }});
+       
+
+         new $.jtips().create({target:$('#target2'),config:{
+		  uid:'target2_tips',
+          layout:'bc',
+          content:'content2',
+          ajaxcb:getdata,
+          ajax: false
+       }});
+       
+
+         new $.jtips().create({target:$('#target3'),config:{
+		  uid:'target3_tips',
+          layout:'br',
+          content:'<div style="width:200px;height:50px;lineHeight:100px;textAlign:center;display:inline-block;float:left;">Hello World</div>',
+          ajaxcb:getdata,
+          ajax: false
+       }});
+
+         new $.jtips().create({target:$('#target4'),config:{
+		  uid:'target4_tips',
+          layout:'tl',
+          content:'content4',
+          ajaxcb:getdata,
+          ajax: false
+       }});   
+	   
+	   new $.jtips().create({target:$('#target5'),config:{
+	      uid:'target5_tips',
+          layout:'tr',
+          content:'<span style="height:20px;lineHeight:20px;text-align:center;width:200px;">Give me a message.</span>',
+          ajaxcb:getdata,
+          ajax: false
+       }});
+	   
+	      new $.jtips().create({target:$('#target6'),config:{
+		  uid:'target6_tips',
+          layout:'tc',
+          content:'<div style="width:400px;height:100px;lineHeight:100px;textAlign:center;display:inline-block;float:left;">Hello World</div>',
+          ajaxcb:getdata,
+          ajax: false
+       }});
+
+     });
+     
+  </script>
+</head>
+<body >
+   <table>
+      <tbody>
+      <tr style="background-color:black;color:#FFF">
+		    <td id="target01">taret01 layout:TL</td>
+			<td id="target02">taret02 layout:TC</td>
+			<td id="target03">taret03 layout:TR</td>
+		 </tr>	
+	     <tr style="background-color:blue;color:#FFF">
+		    <td id="target1">taret1 layout:BL</td>
+			<td id="target2">taret2 layout:BC</td>
+			<td id="target3">taret3 layout:BR</td>
+		 </tr>	   
+		 <tr style="background-color:black;color:#FFF">
+		    <td id="target4">taret4 layout:TL</td>
+			<td id="target5">taret5 layout:TC</td>
+			<td id="target6">taret6 layout:TR</td>
+		 </tr>	
+		   <tr style="background-color:blue;color:#FFF">
+		    <td id="target7">taret7 layout:BL</td>
+			<td id="target8">taret8 layout:BC</td>
+			<td id="target9">taret9 layout:BR</td>
+		 </tr> 
+	  </tbody>
+   </table>
+
+</body>
+</html>

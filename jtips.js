@@ -18,6 +18,7 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 ;(function($){
 	$.jtips=function(){
 	var __jtips= function(){};
+	var JTIPS_POOL=[];
 	jQuery.extend(__jtips.prototype,{
 	  width: 100,
 	  height:20,
@@ -28,6 +29,9 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 	  ___arrowpadding:12,
 	  ajax:false,
 	  ajaxDone:false,
+	  triggerEvent:'mouseenter',
+	  uid: jQuery.now(),
+	  tipspool:5,
 	  layoutMap:{//define the layout priority, same as the css rule
 		'bl':1,
 		'bc':2,
@@ -48,6 +52,12 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 		  var t=jQuery(objAux.target);
 		  this.__target=t;
 		  objAux.config?jQuery.extend(this,objAux.config):'';
+		  if(jQuery("#"+this.uid).length>0){
+		    this.__self=jQuery("#"+this.uid);
+			this.__self.show();
+		    this.repaint();
+			return;
+		  }
 		  var _ptop=t.offset().top,_pleft=t.offset().left,_pwidth=t.width(),_pheight=t.height();
 		  var tp=[
 			'<div class="jtips-container" style="display:block;z-index:10000;position:absolute;">',
@@ -62,6 +72,8 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 		jQuery('body').append(tp.join(''));
 		var t=jQuery("div.jtips-container:last");
 		this.__self=t;
+		t.attr('id',this.uid);
+		t.data('uid',this.uid);
 	   // t.offset({'top':_ptop,'left':_pleft});
 		t.width(this.width);
 		t.height(this.height);
@@ -98,11 +110,15 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 		 me.drawOuterContainer(me.getVeto().find('.jtips-canvas'));
 	  });
 	},
+	repaint: function() {
+	    this._analyPosition();
+		this.drawOuterContainer(this.getVeto().find('.jtips-canvas'));
+	},
 	_registerEvents: function(){
 	  var me=this;
 	  this.__hideflag=true;
 	 
-	  this.getTarget()["click"](function(){
+	  this.getTarget()[this.triggerEvent](function(){
 		  me.__hideflag=false;
 		  me._analyPosition();
 		  me.drawOuterContainer(me.getVeto().find('.jtips-canvas'));
@@ -121,7 +137,7 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 	  });
 	},
 	hide: function() {
-		this.getVeto().css({'position':'absolute','left':-10000,'top':-1000});
+		this.getVeto()?this.getVeto().css({'position':'absolute','left':-10000,'top':-1000}):'';
 	},
 	show: function(objAux) {
 		//don't forget the scrollLeft and scrollTop 
@@ -292,8 +308,8 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 		  return;
 		}else{
 		  this.getVeto().find('.jtips-spinner-container').show();
+		  Spinners.create('.jtips-spinner').center().play();
 		}
-		Spinners.create('.jtips-spinner').center().play();
 		this.getVeto().css('position','absolute');// fix the spinner bring position issue;
 	},
 	getSpinner: function() {
@@ -305,18 +321,27 @@ function(b){this.options=a.extend({},this.options,b||{}),this.options.radii&&(b=
 	getTarget: function() {
 	   return this.__target;
 	},
+	// the interface method , user could rewrite this method to do the some init after the html render to the dom.
+	/**
+	* @param _html {}
+	*/
+	afterRender: function(_html){
+	  
+	},
 	_analyPosition: function() {
 		var _t=this.__target;
 		this.hide();
 		var vtop=_t.offset().top-jQuery('body').scrollTop();//view top
 		var vleft=_t.offset().left-jQuery('body').scrollLeft();//view left
+		this.getVetoContent().hide();
 		if(!this.__exist){
+		    var _html;
 			if(this.ajax){
-			var _html=this.getVetoContent().html(this.ajaxDone?this.content:'');
-			this.ajaxconfig.afterRender(_html);
+			  _html=this.getVetoContent().html(this.ajaxDone?this.content:'');
 			}else{
-			this.getVetoContent().html(this.content);
+			  _html=this.getVetoContent().html(this.content);
 			}
+			this.afterRender(_html);
 			this.getVetoContent().data('width',this.getVetoContent().children().width());
 			this.getVetoContent().data('height',this.getVetoContent().children().height());
 			this.getVetoContent().width(this.getVetoContent().children().width());
